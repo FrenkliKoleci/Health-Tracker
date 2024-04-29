@@ -1,0 +1,16 @@
+public enum HealthMetricType {
+    AGE("Age"),
+    BLOOD_PRESSURE("Blood Pressure"),
+    HEART_RATE("Heart Rate");
+
+    private final String displayName;
+
+    HealthMetricType(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
+}

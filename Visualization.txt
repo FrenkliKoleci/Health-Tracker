@@ -1,0 +1,16 @@
+public class Visualization {
+    private final HealthData healthData;
+
+    public Visualization(HealthData healthData) {
+        this.healthData = healthData;
+    }
+
+    public void visualizeHealthData() {
+        // Code to visualize health data
+        System.out.println("Visualizing health data...");
+    }
+
+    public HealthData getHealthData() {
+        return healthData;
+    }
+}

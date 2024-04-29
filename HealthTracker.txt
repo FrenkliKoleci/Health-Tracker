@@ -1,0 +1,220 @@
+import java.util.Scanner;
+
+public class HealthTracker {
+    private final Scanner scanner;
+    private final AuthenticationManager authManager;
+    private final HealthData healthData;
+    private final ReportGenerator reportGenerator;
+    private User currentUser;
+
+    public HealthTracker() {
+        scanner = new Scanner(System.in);
+        authManager = new AuthenticationManager();
+        healthData = new HealthData();
+        reportGenerator = new ReportGenerator(healthData);
+        currentUser = null;
+    }
+
+    public void displayMainMenu() {
+        System.out.println("--- Health Tracker ---");
+        System.out.println("1. Register");
+        System.out.println("2. Login");
+        System.out.println("3. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    public void displayUserMenu() {
+        System.out.println("\n--- User Menu ---");
+        System.out.println("1. Add Health Metric");
+        System.out.println("2. Remove Health Metric");
+        System.out.println("3. Set Goal");
+        System.out.println("4. Generate Health Report");
+        System.out.println("5. Logout");
+        System.out.println("6. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    public void register() {
+        System.out.print("Enter a username: ");
+        final String username = scanner.nextLine();
+
+        if (authManager.userExists(username)) {
+            System.out.println("Username already exists. Registration failed.");
+            return;
+        }
+
+        System.out.print("Enter a password: ");
+        final String password = scanner.nextLine();
+
+        authManager.register(username, password);
+        System.out.println("Registration successful.");
+    }
+
+    public void login() {
+        System.out.print("Enter your username: ");
+        final String username = scanner.nextLine();
+
+        System.out.print("Enter your password: ");
+        final String password = scanner.nextLine();
+
+        final User user = authManager.authenticate(username, password);
+
+        if (user != null) {
+            currentUser = user;
+            System.out.println("Login successful. Welcome, " + currentUser.getUsername() + "!");
+        } else {
+            System.out.println("Invalid username or password. Login failed.");
+        }
+    }
+
+    public void logout() {
+        currentUser = null;
+        System.out.println("Logout successful.");
+    }
+
+    public HealthMetricType promptForHealthMetricType() {
+        System.out.println("Select a health metric type:");
+        System.out.println("1. Age");
+        System.out.println("2. Blood Pressure");
+        System.out.println("3. Heart Rate");
+        System.out.print("Enter the number of the health metric type: ");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline character
+
+        switch (choice) {
+            case 1:
+                return HealthMetricType.AGE;
+            case 2:
+                return HealthMetricType.BLOOD_PRESSURE;
+            case 3:
+                return HealthMetricType.HEART_RATE;
+            default:
+                System.out.println("Invalid selection. Defaulting to Age.");
+                return HealthMetricType.AGE;
+        }
+    }
+
+    public void addHealthMetric() {
+        final HealthMetricType metricType = promptForHealthMetricType();
+
+        System.out.print("Enter the value for " + metricType + ": ");
+        double value = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline character
+
+        final HealthMetric healthMetric = new HealthMetric(metricType.toString(), value);
+        healthData.addHealthMetric(healthMetric);
+        System.out.println("Health metric added successfully.");
+    }
+
+    public void removeHealthMetric() {
+        final int healthMetricCount = healthData.getHealthMetricCount();
+
+        if (healthMetricCount == 0) {
+            System.out.println("No health metrics available to remove.");
+            return;
+        }
+
+        System.out.println("Select a health metric to remove:");
+
+        for (int i = 0; i < healthMetricCount; i++) {
+            final HealthMetric healthMetric = healthData.getHealthMetricByIndex(i);
+            System.out.println((i + 1) + ". " + healthMetric.getName());
+        }
+
+        System.out.print("Enter the number of the health metric to remove: ");
+        int index = scanner.nextInt();
+        scanner.nextLine(); // Consume newline character
+
+        if (index >= 1 && index <= healthMetricCount) {
+            healthData.removeHealthMetricByIndex(index - 1);
+            System.out.println("Health metric removed successfully.");
+        } else {
+            System.out.println("Invalid selection. No health metric removed.");
+        }
+    }
+
+    public void setGoal() {
+        final HealthMetricType metricType = promptForHealthMetricType();
+
+        System.out.print("Enter the minimum value for " + metricType + ": ");
+        double minValue = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline character
+
+        System.out.print("Enter the maximum value for " + metricType + ": ");
+        double maxValue = scanner.nextDouble();
+        scanner.nextLine(); // Consume newline character
+
+        final Goal goal = new Goal(metricType.toString(), minValue, maxValue);
+        healthData.setGoal(goal);
+        System.out.println("Goal set successfully.");
+    }
+
+    public void generateHealthReport() {
+        reportGenerator.generateReport();
+    }
+
+    public void run() {
+        boolean exit = false;
+
+        while (!exit) {
+            displayMainMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            switch (choice) {
+                case 1:
+                    register();
+                    break;
+                case 2:
+                    login();
+                    break;
+                case 3:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+
+            if (currentUser != null) {
+                while (!exit) {
+                    displayUserMenu();
+                    choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline character
+
+                    switch (choice) {
+                        case 1:
+                            addHealthMetric();
+                            break;
+                        case 2:
+                            removeHealthMetric();
+                            break;
+                        case 3:
+                            setGoal();
+                            break;
+                        case 4:
+                            generateHealthReport();
+                            break;
+                        case 5:
+                            logout();
+                            exit = true;
+                            break;
+                        case 6:
+                            exit = true;
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Please try again.");
+                    }
+                }
+            }
+        }
+
+        System.out.println("Exiting program.");
+        scanner.close();
+    }
+
+    public static void main(final String[] args) {
+        final HealthTracker healthTracker = new HealthTracker();
+        healthTracker.run();
+    }
+}

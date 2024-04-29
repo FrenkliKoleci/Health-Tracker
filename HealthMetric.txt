@@ -1,0 +1,17 @@
+public class HealthMetric {
+    private final String name;
+    private final double value;
+
+    public HealthMetric(String name, double value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getValue() {
+        return value;
+    }
+}

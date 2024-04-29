@@ -1,0 +1,19 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class HealthData {
+    private final List<HealthMetric> healthMetrics;
+    private Goal goal;
+
+    public HealthData() {
+        healthMetrics = new ArrayList<>();
+        goal = null;
+    }
+
+    public void addHealthMetric(HealthMetric healthMetric) {
+        healthMetrics.add(healthMetric);
+    }
+
+    public int getHealthMetricCount() {
+        return healthMetrics.size();
+    }

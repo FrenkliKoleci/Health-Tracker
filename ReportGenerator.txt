@@ -1,0 +1,33 @@
+public class ReportGenerator {
+    private final HealthData healthData;
+
+    public ReportGenerator(HealthData healthData) {
+        this.healthData = healthData;
+    }
+
+    public void generateReport() {
+        System.out.println("--- Health Report ---");
+
+        // Check if a goal is set
+        Goal goal = healthData.getGoal();
+        if (goal != null) {
+            System.out.println("Goal: " + goal.getMetricType() + " between " + goal.getMinValue() + " and " + goal.getMaxValue());
+        } else {
+            System.out.println("Goal: No goal set");
+        }
+
+        // Display health metrics
+        int healthMetricCount = healthData.getHealthMetricCount();
+        if (healthMetricCount == 0) {
+            System.out.println("No health metrics available");
+        } else {
+            System.out.println("Health Metrics:");
+            for (int i = 0; i < healthMetricCount; i++) {
+                HealthMetric healthMetric = healthData.getHealthMetricByIndex(i);
+                System.out.println(healthMetric.getName() + ": " + healthMetric.getValue());
+            }
+        }
+
+        System.out.println("---------------------");
+    }
+}

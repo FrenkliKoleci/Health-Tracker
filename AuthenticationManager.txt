@@ -1,0 +1,28 @@
+import java.util.HashMap;
+import java.util.Map;
+
+public class AuthenticationManager {
+    private final Map<String, String> userCredentials;
+
+    public AuthenticationManager() {
+        userCredentials = new HashMap<>();
+    }
+
+    public boolean userExists(String username) {
+        return userCredentials.containsKey(username);
+    }
+
+    public void register(String username, String password) {
+        userCredentials.put(username, password);
+    }
+
+    public User authenticate(String username, String password) {
+        String storedPassword = userCredentials.get(username);
+
+        if (storedPassword != null && storedPassword.equals(password)) {
+            return new User(username);
+        }
+
+        return null;
+    }
+}
